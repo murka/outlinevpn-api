@@ -79,4 +79,12 @@ export class OutlineVPN {
         return json
     }
 
+    public async disableUser(id: string): Promise<boolean> {
+        return await this.addDataLimit(id, 0)
+    }
+
+    public async enableUser(id: string): Promise<boolean> {
+        return await this.deleteDataLimit(id)
+    }
+
 }
