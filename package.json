@@ -2,6 +2,12 @@
   "name": "outlinevpn-api",
   "version": "1.0.0",
   "description": "The Outline VPN API client",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://murka.me/oss"
+    }
+  ],
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc"
