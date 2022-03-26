@@ -15,4 +15,4 @@ async function main() {
 main()
 ```
 
-More features: [murka/outlinevpn-api](https://github.com/murka/outline-api/blob/master/src/index.ts)
+More features: [murka/outlinevpn-api](https://github.com/murka/outlinevpn-api/blob/master/src/index.ts)
