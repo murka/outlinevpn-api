@@ -1,6 +1,6 @@
 {
   "name": "outlinevpn-api",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "description": "The Outline VPN API client",
   "license": "MIT",
   "homepage": "https://github.com/murka/outlinevpn-api",
