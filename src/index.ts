@@ -55,11 +55,11 @@ export class OutlineVPN {
         return response.ok
     }
 
-    public async addDataLimit(id: string, /** @type bytes */ dataLimit: number): Promise<boolean> {
+    public async addDataLimit(id: string, bytes: number): Promise<boolean> {
         const response = await fetch(`${this.apiUrl}/access-keys/${id}/data-limit`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ dataLimit })
+            body: JSON.stringify({ limit: { bytes } })
         })
 
         return response.ok
