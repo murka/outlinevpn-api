@@ -3,7 +3,7 @@
 Nodejs Client package for [Jigsaw-Code/outline-server](https://github.com/Jigsaw-Code/outline-server)
 
 ```ts
-import { OutlineVPN } from 'outlinevpn-api'
+import OutlineVPN from 'outlinevpn-api'
 
 const outlinevpn = new OutlineVPN(process.env.OUTLINE_API_URL)
 

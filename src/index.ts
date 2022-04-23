@@ -1,10 +1,10 @@
 import https from 'node:https'
-import nodefetch, { RequestInfo, RequestInit } from 'node-fetch'
+import nodefetch, { RequestInfo, RequestInit, Headers } from 'node-fetch'
 import { User } from "./types"
 
 const fetch = (url: RequestInfo, init?: RequestInit) => nodefetch(url, { ...init, agent: new https.Agent({ rejectUnauthorized: false }) })
 
-export class OutlineVPN {
+export default class OutlineVPN {
     apiUrl: string
     constructor(apiUrl: string) {
         this.apiUrl = apiUrl
@@ -48,7 +48,7 @@ export class OutlineVPN {
     public async renameUser(id: string, name: string): Promise<boolean> {
         const response = await fetch(`${this.apiUrl}/access-keys/${id}/name`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: new Headers({ 'Content-Type': 'application/json' }),
             body: JSON.stringify({ name })
         })
 
@@ -58,7 +58,7 @@ export class OutlineVPN {
     public async addDataLimit(id: string, bytes: number): Promise<boolean> {
         const response = await fetch(`${this.apiUrl}/access-keys/${id}/data-limit`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: new Headers({ 'Content-Type': 'application/json' }),
             body: JSON.stringify({ limit: { bytes } })
         })
 
