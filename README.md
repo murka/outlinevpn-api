@@ -73,5 +73,5 @@ await outlinevpn.addDataLimit("1984", 1984e8)
 
 # getTransferredData(): Promise<number>
 ```ts
-await outlinevpn.addDataLimit()
+await outlinevpn.getTransferredData()
 ```
