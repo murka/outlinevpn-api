@@ -1,5 +1,4 @@
-import https from 'node:https'
-import nodefetch, { RequestInfo, RequestInit, Headers } from 'node-fetch'
+import { fetch, setGlobalDispatcher, Agent } from "undici"
 import type {
     User,
     Server,
@@ -7,22 +6,24 @@ import type {
     ServerMetrics
 } from "./types"
 
-const fetch = (url: RequestInfo, init?: RequestInit) => nodefetch(url, { ...init, agent: new https.Agent({ rejectUnauthorized: false }) })
-
-
 export default class OutlineVPN {
     apiUrl: string
     constructor(apiUrl: string) {
         this.apiUrl = apiUrl
+        setGlobalDispatcher(new Agent({
+            connect: {
+                rejectUnauthorized: false
+            }
+        }))
     }
 
-    public async getServer(): Promise<Server> {
+    public async getServer() {
         const response = await fetch(`${this.apiUrl}/server`)
         const json = await response.json()
-        return json
+        return json as Server
     }
 
-    public async renameServer(name: string): Promise<boolean> {
+    public async renameServer(name: string)  {
         const response = await fetch(`${this.apiUrl}/name`, {
             method: 'PUT',
             headers: new Headers({ 'Content-Type': 'application/json' }),
@@ -32,7 +33,7 @@ export default class OutlineVPN {
         return response.ok
     }
 
-    public async setDefaultDataLimit(bytes: number): Promise<boolean> {
+    public async setDefaultDataLimit(bytes: number) {
         const response = await fetch(`${this.apiUrl}/server/access-key-data-limit`, {
             method: 'PUT',
             headers: new Headers({ 'Content-Type': 'application/json' }),
@@ -70,16 +71,16 @@ export default class OutlineVPN {
         return response.ok
     }
 
-    public async getDataUsage(): Promise<DataUsageByUser> {
+    public async getDataUsage() {
         const response = await fetch(`${this.apiUrl}/metrics/transfer`)
         const json = await response.json()
-        return json
+        return json as DataUsageByUser
     }
 
-    public async getShareMetrics(): Promise<ServerMetrics> {
+    public async getShareMetrics() {
         const response = await fetch(`${this.apiUrl}/metrics/enabled`)
         const json = await response.json()
-        return json
+        return json as ServerMetrics
     }
 
     public async setShareMetrics(metricsEnabled: boolean): Promise<boolean> {
@@ -92,10 +93,10 @@ export default class OutlineVPN {
         return response.ok
     }
 
-    public async getUsers(): Promise<User[]> {
+    public async getUsers() {
         const response = await fetch(`${this.apiUrl}/access-keys`)
-        const { accessKeys } = await response.json()
-        return accessKeys
+        const json = await response.json() as { accessKeys: User[] }
+        return json?.accessKeys ?? []
     }
 
     // Rewrite to /access-keys/:id if https://github.com/Jigsaw-Code/outline-server/pull/1142 has been merged.
@@ -111,13 +112,13 @@ export default class OutlineVPN {
         }
     }
 
-    public async createUser(): Promise<User> {
+    public async createUser() {
         const response = await fetch(`${this.apiUrl}/access-keys`, {
             method: 'POST'
         })
 
         const json = await response.json()
-        return json
+        return json as User
     }
 
     public async deleteUser(id: string): Promise<boolean> {
@@ -156,17 +157,17 @@ export default class OutlineVPN {
         return response.ok
     }
 
-    public async getTransferredData(): Promise<number> {
+    public async getTransferredData() {
         const response = await fetch(`${this.apiUrl}/metrics/transfer`)
         const json = await response.json()
-        return json
+        return json as number
     }
 
-    public async disableUser(id: string): Promise<boolean> {
+    public async disableUser(id: string) {
         return await this.addDataLimit(id, 0)
     }
 
-    public async enableUser(id: string): Promise<boolean> {
+    public async enableUser(id: string) {
         return await this.deleteDataLimit(id)
     }
 
