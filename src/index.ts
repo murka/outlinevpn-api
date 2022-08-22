@@ -98,6 +98,7 @@ export default class OutlineVPN {
         return accessKeys
     }
 
+    // Rewrite to /access-keys/:id if https://github.com/Jigsaw-Code/outline-server/pull/1142 has been merged.
     public async getUser(id: string): Promise<User|null> {
         const users = await this.getUsers()
 
