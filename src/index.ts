@@ -99,12 +99,10 @@ export default class OutlineVPN {
     }
 
     public async getUser(id: string): Promise<User|null> {
-        const users = await this.getUsers()
-
-        const user = users.filter(user => user.id === id)
-
-        if(user.length) {
-            return user[0]
+        const response = await fetch(`${this.apiUrl}/access-keys/${id}`)
+        if(response.ok) {
+            const json = await response.json()
+            return json
         } else {
             return null
         }
