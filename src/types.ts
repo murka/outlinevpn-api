@@ -28,3 +28,16 @@ export interface DataUsageByUser {
 export interface ServerMetrics {
     metricsEnabled: boolean
 }
+
+export interface HttpRequest {
+    url: string
+    method: string
+    headers?: Record<string, string>
+    body?: string
+}
+
+export interface HttpResponse {
+    ok: boolean
+    status?: number
+    body?: string
+}
