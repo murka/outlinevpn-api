@@ -9,7 +9,10 @@ Example:
 ```ts
 import OutlineVPN from 'outlinevpn-api'
 
-const outlinevpn = new OutlineVPN(process.env.OUTLINE_API_URL)
+const outlinevpn = new OutlineVPN({
+    apiUrl: process.env.OUTLINE_API_URL,
+    fingerprint: process.env.OUTLINE_API_FINGERPRINT
+})
 
 async function main() {
     const users = outlinevpn.getUsers()
