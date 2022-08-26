@@ -26,11 +26,10 @@ export default async function fetchWithPin(
         const certificate = socket.getPeerCertificate()
         // Parse fingerprint in "AB:CD:EF" form.
         const sha2hex = certificate.fingerprint256.replace(/:/g, '')
-        const sha2binary = Buffer.from(sha2hex, 'hex').toString('binary')
-        if (sha2binary !== fingerprint) {
+        if (sha2hex !== fingerprint) {
           request.emit(
             'error',
-            new Error(`Fingerprint mismatch: expected ${fingerprint}, not ${sha2binary}`)
+            new Error(`Fingerprint mismatch: expected ${fingerprint}, not ${sha2hex}`)
           )
           request.destroy()
           return
