@@ -133,13 +133,13 @@ export default class OutlineVPN {
     public async getUser(id: string): Promise<User|null> {
         const users = await this.getUsers()
 
-        const user = users.filter(user => user.id === id)
-
-        if(user.length) {
-            return user[0]
-        } else {
-            return null
+        for (const user of users) {
+            if(user.id === id) {
+                return user
+            }
         }
+
+        return null
     }
 
     public async createUser(): Promise<User> {
