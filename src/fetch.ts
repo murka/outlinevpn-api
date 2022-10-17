@@ -20,22 +20,16 @@ export default async function fetchWithPin(
     }
     const request = https.request(options, resolve).on('error', reject)
 
-    // Enforce certificate fingerprint match.
-    request.on('socket', (socket: TLSSocket) =>
-      socket.on('secureConnect', () => {
-        const certificate = socket.getPeerCertificate()
-        // Parse fingerprint in "AB:CD:EF" form.
-        const sha2hex = certificate.fingerprint256.replace(/:/g, '')
-        if (sha2hex !== fingerprint) {
-          request.emit(
-            'error',
-            new Error(`Fingerprint mismatch: expected ${fingerprint}, not ${sha2hex}`)
-          )
-          request.destroy()
-          return
+    if(request.socket) {
+      request.socket.on('secureConnect', () => {
+        const socket = request.socket as TLSSocket
+        const cert = socket.getPeerCertificate()
+        console.log(cert.fingerprint256)
+        if (cert.fingerprint256 !== fingerprint) {
+          reject(new Error(`Certificate fingerprint does not match ${fingerprint}`))
         }
       })
-    )
+    }
 
     if (req.body) {
       request.write(req.body)
