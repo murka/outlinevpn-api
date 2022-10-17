@@ -24,7 +24,6 @@ export default async function fetchWithPin(
       request.socket.on('secureConnect', () => {
         const socket = request.socket as TLSSocket
         const cert = socket.getPeerCertificate()
-        console.log(cert.fingerprint256)
         if (cert.fingerprint256 !== fingerprint) {
           reject(new Error(`Certificate fingerprint does not match ${fingerprint}`))
         }
