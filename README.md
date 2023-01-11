@@ -2,7 +2,8 @@
 
 Nodejs Client package for [Jigsaw-Code/outline-server](https://github.com/Jigsaw-Code/outline-server)
 
-GitHub: [github.com/murka/outlinevpn-api](https://github.com/murka/outlinevpn-api)
+GitHub: [github.com/murka/outlinevpn-api](https://github.com/murka/outlinevpn-api)  
+NPM: [npm.im/outlinevpn-api](https://npm.im/outlinevpn-api)
 
 
 Example:
@@ -15,7 +16,7 @@ const outlinevpn = new OutlineVPN({
 })
 
 async function main() {
-    const users = outlinevpn.getUsers()
+    const users = await outlinevpn.getUsers()
     console.log(users)
 }
 
