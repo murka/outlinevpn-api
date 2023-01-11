@@ -8,7 +8,7 @@ import type {
 } from "./types"
 
 
-export default class OutlineVPN {
+export class OutlineVPN {
     apiUrl: string
     fingerprint: string
     constructor({ apiUrl, fingerprint }: { apiUrl: string, fingerprint: string }) {
