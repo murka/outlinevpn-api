@@ -4,20 +4,23 @@ import type {
     Server,
     DataUsageByUser,
     ServerMetrics,
-    HttpRequest
+    HttpRequest,
+    Options
 } from "./types"
 
 
 export class OutlineVPN {
     apiUrl: string
     fingerprint: string
-    constructor({ apiUrl, fingerprint }: { apiUrl: string, fingerprint: string }) {
-        this.apiUrl = apiUrl
-        this.fingerprint = fingerprint
+    timeout?: number
+    constructor(options: Options) {
+        this.apiUrl = options.apiUrl
+        this.fingerprint = options.fingerprint
+        this.timeout = options.timeout
     }
 
     private async fetch(req: HttpRequest) {
-        return await fetchWithPin(req, this.fingerprint)
+        return await fetchWithPin(req, this.fingerprint, this.timeout)
     }
 
     public async getServer(): Promise<Server> {
