@@ -39,5 +39,5 @@ export interface HttpRequest {
 export interface HttpResponse {
     ok: boolean
     status?: number
-    body?: string
+    body: string
 }

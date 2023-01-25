@@ -22,8 +22,7 @@ export class OutlineVPN {
 
     public async getServer(): Promise<Server> {
         const response = await this.fetch({ url: `${this.apiUrl}/server`, method: 'GET' })
-        
-        if(response.body) {
+        if(response.ok) {
             const json = JSON.parse(response.body)
             return json
         } else {
@@ -84,7 +83,7 @@ export class OutlineVPN {
     public async getDataUsage(): Promise<DataUsageByUser> {
         const response = await this.fetch({ url: `${this.apiUrl}/metrics/transfer`, method: 'GET' })
 
-        if(response.body) {
+        if(response.ok) {
             const json = JSON.parse(response.body)
             return json
         } else {
@@ -95,7 +94,7 @@ export class OutlineVPN {
     public async getShareMetrics(): Promise<ServerMetrics> {
         const response = await this.fetch({ url: `${this.apiUrl}/metrics/enabled`, method: 'GET' })
 
-        if(response.body) {
+        if(response.ok) {
             const json = JSON.parse(response.body)
             return json
         } else {
@@ -110,7 +109,7 @@ export class OutlineVPN {
             body: JSON.stringify({ metricsEnabled })
         })
 
-        if(response.body) {
+        if(response.ok) {
             const json = JSON.parse(response.body)
             return json
         } else {
@@ -121,7 +120,7 @@ export class OutlineVPN {
     public async getUsers(): Promise<User[]> {
         const response = await this.fetch({ url: `${this.apiUrl}/access-keys`, method: 'GET' })
 
-        if(response.body) {
+        if(response.ok) {
             const { accessKeys } = JSON.parse(response.body)
             return accessKeys
         } else {
@@ -148,7 +147,7 @@ export class OutlineVPN {
             method: 'POST'
         })
 
-        if(response.body) {
+        if(response.ok) {
             const json = JSON.parse(response.body)
             return json
         } else {
