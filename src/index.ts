@@ -9,7 +9,7 @@ import type {
 } from "./types"
 
 
-export class OutlineVPN {
+export default class OutlineVPN {
     apiUrl: string
     fingerprint: string
     timeout?: number
