@@ -8,8 +8,7 @@ import type {
     Options
 } from "./types"
 
-
-export default class OutlineVPN {
+class OutlineVPN {
     apiUrl: string
     fingerprint: string
     timeout?: number
@@ -207,3 +206,5 @@ export default class OutlineVPN {
     }
 
 }
+
+export default OutlineVPN;
