@@ -8,7 +8,7 @@ NPM: [npm.im/outlinevpn-api](https://npm.im/outlinevpn-api)
 
 Example:
 ```ts
-import OutlineVPN from 'outlinevpn-api'
+import { OutlineVPN } from 'outlinevpn-api'
 
 const outlinevpn = new OutlineVPN({
     apiUrl: process.env.OUTLINE_API_URL,
