@@ -207,4 +207,4 @@ class OutlineVPN {
 
 }
 
-export default OutlineVPN;
+export { OutlineVPN };
