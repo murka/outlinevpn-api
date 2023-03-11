@@ -93,6 +93,18 @@ class OutlineVPN {
         }
     }
 
+    public async getDataUserUsage(id: string): Promise<number> {
+        const { bytesTransferredByUserId } = await this.getDataUsage()
+
+        const userUsage = bytesTransferredByUserId[id]
+
+        if(userUsage) {
+            return userUsage
+        } else {
+            throw new Error('No user found, check metrics is enabled')
+        }
+    }
+
     public async getShareMetrics(): Promise<ServerMetrics> {
         const response = await this.fetch({ url: `${this.apiUrl}/metrics/enabled`, method: 'GET' })
 
