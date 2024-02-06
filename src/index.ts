@@ -1,31 +1,42 @@
-import https from 'node:https'
-import nodefetch, { RequestInfo, RequestInit, Headers } from 'node-fetch'
+import fetchWithPin from './fetch'
 import type {
     User,
     Server,
     DataUsageByUser,
-    ServerMetrics
+    ServerMetrics,
+    HttpRequest,
+    Options
 } from "./types"
 
-const fetch = (url: RequestInfo, init?: RequestInit) => nodefetch(url, { ...init, agent: new https.Agent({ rejectUnauthorized: false }) })
-
-
-export default class OutlineVPN {
+class OutlineVPN {
     apiUrl: string
-    constructor(apiUrl: string) {
-        this.apiUrl = apiUrl
+    fingerprint: string
+    timeout?: number
+    constructor(options: Options) {
+        this.apiUrl = options.apiUrl
+        this.fingerprint = options.fingerprint
+        this.timeout = options.timeout
+    }
+
+    private async fetch(req: HttpRequest) {
+        return await fetchWithPin(req, this.fingerprint, this.timeout)
     }
 
     public async getServer(): Promise<Server> {
-        const response = await fetch(`${this.apiUrl}/server`)
-        const json = await response.json()
-        return json
+        const response = await this.fetch({ url: `${this.apiUrl}/server`, method: 'GET' })
+        if(response.ok) {
+            const json = JSON.parse(response.body)
+            return json
+        } else {
+            throw new Error('No server found')
+        }
     }
 
     public async renameServer(name: string): Promise<boolean> {
-        const response = await fetch(`${this.apiUrl}/name`, {
+        const response = await this.fetch({
+            url: `${this.apiUrl}/name`,
             method: 'PUT',
-            headers: new Headers({ 'Content-Type': 'application/json' }),
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name })
         })
 
@@ -33,9 +44,10 @@ export default class OutlineVPN {
     }
 
     public async setDefaultDataLimit(bytes: number): Promise<boolean> {
-        const response = await fetch(`${this.apiUrl}/server/access-key-data-limit`, {
+        const response = await this.fetch({
+            url: `${this.apiUrl}/server/access-key-data-limit`,
             method: 'PUT',
-            headers: new Headers({ 'Content-Type': 'application/json' }),
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ limit: { bytes } })
         })
 
@@ -43,7 +55,7 @@ export default class OutlineVPN {
     }
 
     public async deleteDefaultDataLimit(): Promise<boolean> {
-        const response = await fetch(`${this.apiUrl}/server/access-key-data-limit`, {
+        const response = await this.fetch({ url: `${this.apiUrl}/server/access-key-data-limit`,
             method: 'DELETE'
         })
 
@@ -51,9 +63,9 @@ export default class OutlineVPN {
     }
 
     public async setHostnameForAccessKeys(hostname: string): Promise<boolean> {
-        const response = await fetch(`${this.apiUrl}/server/hostname-for-access-keys`, {
+        const response = await this.fetch({ url: `${this.apiUrl}/server/hostname-for-access-keys`,
             method: 'PUT',
-            headers: new Headers({ 'Content-Type': 'application/json' }),
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ hostname })
         })
 
@@ -61,9 +73,9 @@ export default class OutlineVPN {
     }
 
     public async setPortForNewAccessKeys(port: number): Promise<boolean> {
-        const response = await fetch(`${this.apiUrl}/server/port-for-new-access-keys`, {
+        const response = await this.fetch({ url: `${this.apiUrl}/server/port-for-new-access-keys`,
             method: 'PUT',
-            headers: new Headers({ 'Content-Type': 'application/json' }),
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ port })
         })
 
@@ -71,31 +83,63 @@ export default class OutlineVPN {
     }
 
     public async getDataUsage(): Promise<DataUsageByUser> {
-        const response = await fetch(`${this.apiUrl}/metrics/transfer`)
-        const json = await response.json()
-        return json
+        const response = await this.fetch({ url: `${this.apiUrl}/metrics/transfer`, method: 'GET' })
+
+        if(response.ok) {
+            const json = JSON.parse(response.body)
+            return json
+        } else {
+            throw new Error('No server found')
+        }
+    }
+
+    public async getDataUserUsage(id: string): Promise<number> {
+        const { bytesTransferredByUserId } = await this.getDataUsage()
+
+        const userUsage = bytesTransferredByUserId[id]
+
+        if(userUsage) {
+            return userUsage
+        } else {
+            throw new Error('No user found, check metrics is enabled')
+        }
     }
 
     public async getShareMetrics(): Promise<ServerMetrics> {
-        const response = await fetch(`${this.apiUrl}/metrics/enabled`)
-        const json = await response.json()
-        return json
+        const response = await this.fetch({ url: `${this.apiUrl}/metrics/enabled`, method: 'GET' })
+
+        if(response.ok) {
+            const json = JSON.parse(response.body)
+            return json
+        } else {
+            throw new Error('No server found')
+        }
     }
 
     public async setShareMetrics(metricsEnabled: boolean): Promise<boolean> {
-        const response = await fetch(`${this.apiUrl}/metrics/enabled`, {
+        const response = await this.fetch({ url: `${this.apiUrl}/metrics/enabled`,
             method: 'PUT',
-            headers: new Headers({ 'Content-Type': 'application/json' }),
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ metricsEnabled })
         })
 
-        return response.ok
+        if(response.ok) {
+            const json = JSON.parse(response.body)
+            return json
+        } else {
+            throw new Error('No server found')
+        }
     }
 
     public async getUsers(): Promise<User[]> {
-        const response = await fetch(`${this.apiUrl}/access-keys`)
-        const { accessKeys } = await response.json()
-        return accessKeys
+        const response = await this.fetch({ url: `${this.apiUrl}/access-keys`, method: 'GET' })
+
+        if(response.ok) {
+            const { accessKeys } = JSON.parse(response.body)
+            return accessKeys
+        } else {
+            throw new Error('No server found')
+        }
     }
 
     public async getUser(id: string): Promise<User|null> {
@@ -103,22 +147,28 @@ export default class OutlineVPN {
         if(response.ok) {
             const json = await response.json()
             return json
-        } else {
-            return null
         }
+
+        return null
     }
 
     public async createUser(): Promise<User> {
-        const response = await fetch(`${this.apiUrl}/access-keys`, {
+        const response = await this.fetch({
+            url: `${this.apiUrl}/access-keys`,
             method: 'POST'
         })
 
-        const json = await response.json()
-        return json
+        if(response.ok) {
+            const json = JSON.parse(response.body)
+            return json
+        } else {
+            throw new Error('No server found')
+        }
     }
 
     public async deleteUser(id: string): Promise<boolean> {
-        const response = await fetch(`${this.apiUrl}/access-keys/${id}`, {
+        const response = await this.fetch({
+            url: `${this.apiUrl}/access-keys/${id}`,
             method: 'DELETE'
         })
 
@@ -126,9 +176,10 @@ export default class OutlineVPN {
     }
 
     public async renameUser(id: string, name: string): Promise<boolean> {
-        const response = await fetch(`${this.apiUrl}/access-keys/${id}/name`, {
+        const response = await this.fetch({
+            url: `${this.apiUrl}/access-keys/${id}/name`,
             method: 'PUT',
-            headers: new Headers({ 'Content-Type': 'application/json' }),
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name })
         })
 
@@ -136,9 +187,10 @@ export default class OutlineVPN {
     }
 
     public async addDataLimit(id: string, bytes: number): Promise<boolean> {
-        const response = await fetch(`${this.apiUrl}/access-keys/${id}/data-limit`, {
+        const response = await this.fetch({
+            url: `${this.apiUrl}/access-keys/${id}/data-limit`,
             method: 'PUT',
-            headers: new Headers({ 'Content-Type': 'application/json' }),
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ limit: { bytes } })
         })
 
@@ -146,17 +198,12 @@ export default class OutlineVPN {
     }
 
     public async deleteDataLimit(id: string): Promise<boolean> {
-        const response = await fetch(`${this.apiUrl}/access-keys/${id}/data-limit`, {
+        const response = await this.fetch({
+            url: `${this.apiUrl}/access-keys/${id}/data-limit`,
             method: 'DELETE'
         })
 
         return response.ok
-    }
-
-    public async getTransferredData(): Promise<number> {
-        const response = await fetch(`${this.apiUrl}/metrics/transfer`)
-        const json = await response.json()
-        return json
     }
 
     public async disableUser(id: string): Promise<boolean> {
@@ -168,3 +215,5 @@ export default class OutlineVPN {
     }
 
 }
+
+export { OutlineVPN };

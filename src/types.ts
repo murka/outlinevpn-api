@@ -1,3 +1,19 @@
+export interface Options {
+    /**
+     * The URL of the Outline server API.
+     */
+    apiUrl: string
+    /**
+     * The sha256 fingerprint of the server's certificate.
+     */
+    fingerprint: string
+    /**
+     * The number of milliseconds to wait before timing out a request.
+     * @default 10000
+     */
+    timeout?: number
+}
+
 export interface User {
     id: string,
     name: string,
@@ -27,4 +43,17 @@ export interface DataUsageByUser {
 
 export interface ServerMetrics {
     metricsEnabled: boolean
+}
+
+export interface HttpRequest {
+    url: string
+    method: string
+    headers?: Record<string, string>
+    body?: string
+}
+
+export interface HttpResponse {
+    ok: boolean
+    status?: number
+    body: string
 }

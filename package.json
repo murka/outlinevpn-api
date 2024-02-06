@@ -1,6 +1,6 @@
 {
   "name": "outlinevpn-api",
-  "version": "1.5.0",
+  "version": "2.2.0",
   "description": "The Outline VPN API client",
   "license": "MIT",
   "homepage": "https://github.com/murka/outlinevpn-api",
@@ -20,10 +20,7 @@
     "url": "https://murka.me"
   },
   "devDependencies": {
-    "@types/node-fetch": "^2.6.1",
+    "@types/node": "^18.7.13",
     "typescript": "^4.6.2"
-  },
-  "dependencies": {
-    "node-fetch": "^2.6.7"
   }
 }
