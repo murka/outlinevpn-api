@@ -12,28 +12,41 @@ export interface Options {
    * @default 10000
    */
   timeout?: number;
+  /**
+   * The AbortController to use for cancelling requests.
+   */
+  abortController?: AbortController;
 }
 
-export interface User {
+export interface AccessKey {
   id: string;
   name: string;
   password: string;
   port: number;
   method: string;
   accessUrl: string;
+  limit?: {
+    bytes: number;
+  };
 }
+
+export type CreateAccessKeyOptions = Partial<AccessKey>;
 
 export interface Server {
   name: string;
   serverId: string;
   metricsEnabled: boolean;
   createdTimestampMs: number;
-  version: string;
-  portForNewAcccessKeys: number;
-  hostnameForNewAccessKeys: string;
+  portForNewAccessKeys?: number;
+  hostnameForAccessKeys?: string;
+  accessKeyDataLimit?: {
+    bytes: number;
+  };
+  version?: string;
 }
 
-export interface DataUsageByUser {
+// See https://github.com/Jigsaw-Code/outline-server/blob/master/src/shadowbox/model/metrics.ts
+export interface DataUsagePerAccessKey {
   // The userId key should be of type AccessKeyId, however that results in the tsc
   // error TS1023: An index signature parameter type must be 'string' or 'number'.
   // See https://github.com/Microsoft/TypeScript/issues/2491
@@ -50,10 +63,16 @@ export interface HttpRequest {
   method: string;
   headers?: Record<string, string>;
   body?: string;
+  signal?: AbortSignal;
 }
 
 export interface HttpResponse {
   ok: boolean;
   status?: number;
   body: string;
+}
+
+export interface ErrorResponse {
+  code: string;
+  message: string;
 }
